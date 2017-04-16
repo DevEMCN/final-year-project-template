@@ -2,10 +2,12 @@
 
 \chapter*{About this project}
 \paragraph{Abstract}
-A brief description of what the project is, in about two-hundred and fifty words.
+The aim of this project was to create an application for the purpose of general election forecasting in an Irish setting. This process involved compiling a population database, using descriptive and inferential statistics and creating user-friendly interactive maps of Ireland. It was created using a 
+combination of the following technologies: Neo4j, Python, Python Flask web framework and d3.JS. Data was extracted from the Central Statistics Office (CSO) and sorted using Python Pandas to be stored on Neo4j. The database consists of the population of the Republic of Ireland, including the entire electorate as well as potential future electorate members who are over the age of 18 and eligible to register. Data analysis was performed using both general probability and the d’Hondt method. The aim was to investigate how the results of the most recent election in Ireland (i.e. 2016) could be predicted using a combination of known demographic information as well as relevant polling data. The front-end of the project has been designed with two main views for illustrating the results. These maps are interactive and the user has a choice of two viewing options: 1) A view of two maps with one data panel, which displays information either regarding the predictions or the actual results depending on which map is interacted with or  2) A view of one map with two panels of data, such that both the predictions and the results can be illustrated at the same time per county interacted with.
 
 \paragraph{Authors}
-Explain here who the authors are.
+The author of this project is Eamon McNicholas, a final year student of the BSc in Computing in Software Development Honors degree. 
+
 
 
 
@@ -124,6 +126,9 @@ Python Flask is a micro-web framework and is based on two other Python packages:
 	\item Jinja 2 – a templating language for Python based on Django’s templating model \cite{jinja2}.
 \end{itemize}
 The micro part of Flask refers to the fact that the core of the framework is simple but yet to open to extension at the same time. An example of this flexibility is illustrated by the fact that you can choose which database you would prefer to interact with Flask and this decision is not automatically dictated for you by the framework. Another benefit is that while the templating engine is based on Jinja 2, this can also be easily changed and adapted for different purposes as required. Flask is essentially a barebones framework that can be used in conjunction with the many extensions which the Python community have created specifically for it. Finally, It is very easy to get started with Flask. I have provided an example of the simplicity of its use below (call this file run.py) \cite{flask}:
+\linebreak
+\linebreak
+\linebreak
 \begin{minted}{python}
 
 from flask import Flask, render_template
@@ -193,12 +198,59 @@ The benefits of using Pandas include:
 	\item Data sets can be easily merged, joined or reshaped
 	\item Data is can be aligned to a given set of labels provided by its user. Alternatively, Pandas also offers the option to perform this alignment by itself automatically \cite{pandas}.
 \end{itemize}
+
 \subsection{Scrapy}
+Scrapy is an opensource framework that is written in Python and is used for crawling web sites and extracting data. It is commonly used for such applications as data mining, historical data collection or for general information processing. Originally, Scrapy was created for the purpose of web scraping (also refered to as web harvesting or data extraction). Now, it can be used for standard web crawling purposes. You can use an API to extract the desired data; Amazon Web Services is one example of such an interface. Scrapy is often compared to the python library ‘Beautiful Soup’, which is used for parsing HTML and XML. Scrapy uses a built-in mechanism called Selectors in order to crawl websites and extract relevant data.  However, if preferred, there is also an option to use the external library Beautiful Soup instead of this Selectors mechanism. 
+The process works as follows : Scrapy makes requests to URLs provided by the user and then using a function called ‘parse’, it accepts the response from the URL as a parameter. Inside this parse function, it then uses either the built-in CSS Selector or Beautiful Soup to parse the the webpage.
+
+One of the primary advantages of using the Scrapy library is that the Scrapy does not need a request to be finished and processed before it starts to call a new request, which means it is asynchronous.
+Some other benefits of using Scrapy include:
+\begin{itemize}
+	\item An interactive shell console for experimenting with the selectors used for parsing the webpages
+	\item The potential to generate feed exports in various fomarts such as JSON, CSV or XML.
+	\item Extensions and middleware for options such as cookies and session handling, user-age spoofing and crawl depth restriction.
+	\item The option to store the parsed data into backends such as the local file system, AWS S3 or FTP \cite{scrapy}.
+\end{itemize}
+
 \section{Neo4j}
+To explain how Neo4j works, it is first necessary to have a basic understanding of the concept of Property Graph Models. 
+The basis of the property graph is that it contains entities (also known as nodes) that each have their own attributes (also known as key-value pairs). These nodes can be connected through many different types of relationships. Each node can be labelled with a tag, which serves as a way of defining the node’s role within a context.  By defining relationships between different nodes, the model connect them. Each relationship always has a minimum of at least four characteristics: 1) A direction, 2) A defined type of relationship, 3) A start node and 4) An end node. Along with these core criteria, the relationship can also be defined with various properties. Generally, these properties tend to be quantitative in nature (e.g. weights, costs, ratings etc. ). The primary advantage of using this model is that two nodes can share any number/type of relationships and be stored efficiently, without a decrease in the performance. It is also important to note that it is not possible to remove a node without first deleting all relationships, i.e. there can be no broken links. 
+
+\begin{figure}[h]
+	\caption{Property Graph Model}
+	\centering
+	\includegraphics[width=15cm, height=10cm]{img/graphdb-propmodel}
+\end{figure}
+
+Neo4j is a NoSQL graph database that was released in 2007 and was built and implemented with Java and Scala [28]. It implements the Property Graph Model discussed above. Neo4j is appropriate for use in production as it has ACID transaction compliance, runtime failover and cluster support.
+
+\begin{figure}[h]
+	\caption{Neo4j Example}
+	\centering
+	\includegraphics[width=15cm, height=10cm]{img/neo4j-example}
+\end{figure}
+
+To interact with the Neo4j database it is necessary to use the Cypher query language. Cypher is declarative query language that is inspired by SQL and it allows us to select, update, delete or insert into the Neo4j database but not having to describe the “how” of doing so. The majority of queries use the following 3 key words:
+\begin{itemize}
+	\item MATCH – this is specifing the graph pattern you wish to match.
+	\item WHERE -  this is how you add constriants to your pattern matching 
+	\item RETURN – this is what you want to return.
+\end{itemize}
+An example of using cypher on the above Neo4j Image is as follows:
 \begin{minted}{sql}
 MATCH(n:Person)-[:ACTS_IN]->(n:Movie) where n.born = 1956 RETURN n
 \end{minted}
+The above query breaksdown as follows:
+\begin{itemize}
+	\item MATCH(n:Person) – this finds all nodes with the label Person
+	\item -[:ACTS IN]->(n:Movie) specifies it must have a relationship with the node which has the label Movie
+	\item where n.born =1956 RETURN n – where constrains the pattern to only matching a node with the property born equal to 1956 and it returns all nodes matching that pattern, so just the 1 above in the image \cite{neo4j}
+\end{itemize}
 \section{D3.JS}
+D3 (short for data-driven documents, otherwise known as d3.js) is a library created for Javascript that allows for the creation of data visualisations by using common web standards such as SVG, Canvas and HTML. The creator Mike Bostock originally made the Javascript library “Protovis”. 
+However, in 2011, he unfortunately stopped the continous development of this library and switched to improving his other creation, d3.JS., instead. D3 was created with the idea that it need not be a massive library that attempts to solve all problems and provide for every possible need. Instead, it  focuses on being an effiecent manipulator of the DOM by using data-driven techniques. Because it is a small library, it is faster and allows for working with huge datasets, which allows the user to create interactive and animated visualisations.  The following code snippets show both d3s’ code efficiency as well as its usefulness with datasets. 
+
+A standard Javascript approach to selecting all paragraph elements is displayed below:
 \begin{minted}{javascript}
 var paragraphs = document.getElementsByTagName("p");
 for (var i = 0; i < paragraphs.length; i++) {
@@ -206,25 +258,53 @@ var paragraph = paragraphs.item(i);
 paragraph.style.setProperty("color", "white", null);
 }
 \end{minted}
+By comparison, a basic example of D3 is displayed below: 
 \begin{minted}{javascript}
 d3.selectAll("p").style("color", "white");
 \end{minted}
+Finally, a small example of manipulating the DOM with data is shown below:
 \begin{minted}{javascript}
 d3.selectAll("p")
 .data([4, 8, 15, 16, 23, 42])
 .style("font-size", function(d) { return d + "px"; });
 \end{minted}
 \section{Jquery 1.12.x}
-\begin{minted}{javascript}
-$(“button.continue”).html(“Next stop”);
-\end{minted}
-\section{Bootstrap}
+jQuery is a free, open-source Javascript libary that allows for the manipulation of HTML elements through the scripting language Javascript. It is the number one most used Javascript library in the world [30]. jQuery was created in 2006 and is now in its third version. However, both versions 1 and 2 are still widely used. jQuery is lightweight and and fast, allowing the user to control the DOM with the use of very little code. Some of the main benefits of using jQuery include:
 
+\begin{itemize}
+	\item HTML/DOM handling and alteration.
+	\item Manipulation of the CSS elements of HTML elements
+	\item It has made using AJAX/JSONP much simplier to work with.
+	\item It provides for both event handling and effects/animations.
+	\item It has in-built cross-platform compatibility.
+	\item A huge library of plugins have been created for use with jQuery.
+\end{itemize}
+An example of what jQuery looks like is shown below:
+\begin{minted}{javascript}
+$("button.continue").html("Next stop");
+\end{minted}
+The above code works as follows: Using the jQuery selector \textdollar, it gets hold of the button with the class "continue" and changes its HTML ( text ) to "Next stop" \cite{jquery}.
+\section{Bootstrap}
+Bootsrap is a HTML, JS and CSS web framework that was created by developers working for Twitter [31]. It is designed to be used for developing mobile first applications that are responsive, fast and appear neater and cleaner for UI purposes. It is only meant for use with front-end development and does not cater for other development aspects. Bootstrap has responsive CSS built-in for creating apps that scale the elements depending on the size of the screen used (e.g. desktops, tablets, smartphones). Bootstrap was created using the CSS preprocessors LESS and SASS.  Bootstrap comes shipped with in-built components such as dropdowns, navigation bars, pop-overs and other regularly used web components. It also comes with jQuery plugins and is customizable to suit the users’ own designs. Some of the advantages of using Bootstap include: 
+\begin{itemize}
+	\item It has cross-browser compatibility 
+	\item It is open-source
+	\item Its design is consistent throughout the framework
+	\item There are excellent documentation and examples provided on the Bootstrap website.
+	\item Time is not wasted working on CSS when simplicity is required \cite{bootstrap}
+\end{itemize}
 \chapter{System Design}
-\paragraph{}
+This section will provide a comprehensive account of each component of the project, beginning with an outline of the overall design and architecture of the project. Following, it will discuss the process undertaken to acquire the relevant data. The Python library Scrapy was used for data extraction and Pandas library was used for the purpose of data analysis. Next, it will describe how the data was imported into the neo4j database and how the Python library “py2neo” was used to add more properties to the data. Once the data was stored as nodes, labels were then assigned to these nodes depending on their particular properties in the overall database. Following, there will be an account of how the whole application functions through the Python web framework Flask. Finally, the design of the front end section will be described, including an example of the data visualization.
 \section{System Architecture}
+	\begin{figure}[h]
+		\caption{System Architecture}
+		\centering
+		\includegraphics[width=7cm, height=4cm]{img/SystemArchitecture}
+	\end{figure}
+\pagebreak
 \section{Data and Data Analysis}
 \subsection{Historical Data}
+While researching for the results of the general elections in Ireland from 1992-2011, I came across a website called electionsireland.org[13]. The website was created in conjunction with the polititcal analyst, Sean Donnelly. It contains the full results and statistics of each constituency in the Republic of Ireland, for each election dating back as far as the very first one in 1922. However the data was not freely available on the website for downloading in any format. However, given that this website contained all of the relevant data required for this project, I decided to research how to use a web scraper. As I had decided to use Python as my main programming language for this project, I found the library Scrapy. As touched upon already in my technology review, Scrapy is a Python library that does all the hard work for web crawling websites. It allows the user to specificy the starting URLs as well as the selectors for the data parsing. The following is an example code snippet of what one of the three Scrapy spiders used in this project looked like:
 \begin{minted}{python}
 import scrapy
 
@@ -259,10 +339,19 @@ if next_page is not None: # keep going until no pages left to traverse
 next_page = response.urljoin(next_page)
 yield scrapy.Request(next_page, callback=self.parse)
 \end{minted}
+I extracted all of the relevant data that I needed from the website and stored all of it in JSON format to be used in the application. In retrospect,  using Beautiful Soup instead of Scrapy’s built-in selectors would have saved me more time, as I had to experiment a lot with the CSS selectors in order to get the exact data that I required to be parsed by the spiders. 
 \subsection{Population Data}
+As referenced in the methodology section, the population data came from the Central Statistics Office (CSO) and is taken from the 2011 Census section. There are two parts to the population data. The first is the general population statistics for each county. This data comes from the Table "Population by Province County or City, Detailed Marital Status, CensusYear, Sex and Age Group" on the CSO website. It produced 8 CSVS split by province and sex (e.g connaught\textunderscore females.csv). The figures are sorted by "age\textunderscore range" which is in line with how the polling data is also organized (e.g age ranges of 25-24, 35-49 etc.).
+
+It was necessary to transfer text matrixes from the results of the query into csv files as the formats provided by them were unfortunately not suitable for easy Pandas manipulation. The second part of the population data was the social classes population statistics from the CSO. The table source is "Population by Socio-Economic Group, Sex, Province County or City and Year". The social classes were split into five categories in order to match the arrangement of the polling data (e.g AB, C1, DE etc). Each category was then matched to the appropriate polling data category based on a related report by Pfizer \cite{pfizer}. Again, the data formats provided by the CSO website were not suitable so the text matrixes had to be copied into CSV files.
 \subsection{Data Analysis}
 \paragraph{Population}
 \subparagraph{General Population}
+The population data was sorted into CSV files by using a mixture of the Python Pandas library and Pythons’ built in CSV functionality. Ideally, refactoring the data may have made it possible to assign a reusuable class for the functionality. However, in favour of saving time, I assigned a seperate class for each province instead. Each class uses Pandas to extract from the population CSVs certain data, depending on the criteria provided to Pandas. 
+
+Here is a code sample from one of the classes that shows how Pandas works:
+\linebreak
+\linebreak
 \begin{minted}{python}
 # put the connaught males csv into a pandas dataframe
 df = pd.read_csv('app/data/population/population_data/connaughtmales.csv',
@@ -286,6 +375,10 @@ group_list_1.append(df.loc[(df[1] == county) & (df[2] == 'Single') &
 df[3] == '75 - 79 years') | (df[3] == '80 - 85 years') |
 (df[3] == '85 years and over')), 4].sum())
 \end{minted}
+Each class has three functions that return the following lists: 1) All populations of the province, 2) The male population of the province, 3) The female population of the province. Each list is also sorted by age group and marital status. I took an instance of each province class and looped through the population lists retrieved from these instances in order to create CSV files. 
+\pagebreak
+
+Below is an example of a code snippet which illustrates how the loop creates rows on the CSV according to defined characteristics of the population (e.g. ID, gender, location etc.) 
 \begin{minted}{python}
 # this python script is used to create CSV files that are to be imported into
 # the Neo4j database usingNeo4js import functionality
@@ -344,8 +437,81 @@ writer.writerow({'id': 'cm65plus' + str(count),
 'martial_status': status[category_index]})
 count += 1	content...
 \end{minted}
+\pagebreak
 \subparagraph{Social Classes}
+Based on the classification system used in the Irish Times Polls [11] and the Pfizer classifications system [32] ,  Pandas was used to extract the data from the Polling CSV files. A loop was then created to iterate through each county in each province in order to calculate what percentage of the county population belonged to each social class.  The following code snippet is an example which shows what one of the social province classes looks like:
+\begin{minted}{python}
+import pandas as pd
+
+# a class for calculating the % of people in each social class
+class ConnaughtSocial():
+def __init__(self):
+self.df = 
+pd.read_csv('app/data/social_class_data/connaught_social_classes.csv',
+ header=None, delimiter='\t', 
+ converters={"3": int}) # make a dataframe of the 4 social classes
+#farmers dataframe
+self.dff = 
+pd.read_csv('app/data/social_class_data/connaught_farmers.csv', header=None,
+ delimiter='\t', converters={"3": int})   # make a dataframe of the farmers
+# counties in connaught as part of republic of ireland
+self.connaught = connaught = ['Galway', 'Leitrim', 'Mayo', 'Roscommon', 'Sligo']
+# list of lists of the social classes for each county, excluding the farmers 
+self.connaught_social_classes = [] 
+self.farmers = [] # list of number of farmers in each county
+self.connaught_totals = [] # list of total number of people in each county
+# list of lists of the calculated %'s of people divided into classes
+self.connaught_percentages = [] 
+ # fill the list of lists of populations per social classes including farmers
+def populate_counties_classes(self):
+for county in self.connaught:
+group_list_1 = []  # ab, c1, c2, de
+# sourced from  
+#http://stackoverflow.com/questions/37947641/pandas-how-to-sum-columns-based-on-conditional-of-other-column-values
+#ab social classes
+group_list_1.append(self.df.loc[(self.df[1] == county) & (
+(self.df[2] == 'Professional workers')
+ | (self.df[2] == 'Managerial and technical')), 3].sum())
+# c1 social class
+group_list_1.append(self.df.loc[(self.df[1] == county)
+ & (self.df[2] == 'Non-manual'), 3].sum())
+#c2 social class
+group_list_1.append(self.df.loc[(self.df[1] == county) 
+& (self.df[2] == 'Skilled manual'), 3].sum())
+# de social classes
+de = (self.df.loc[(self.df[1] == county) & ((self.df[2] == 'Semi-skilled')
+ | (self.df[2] == 'Unskilled')
+| (self.df[2] == 'All other gainfully occupied and unknown')), 3].sum())
+
+farmers = (self.dff.loc[(self.dff[2] == county), 3].sum())
+# take away the farmers in this county from this social class
+group_list_1.append(de - farmers) 
+
+self.connaught_social_classes.append(group_list_1) # append ab - de
+self.farmers.append(farmers) # lastly append the farmers
+# make a list of the total number of people in each county
+def populate_totals(self): 
+for index,county in enumerate(self.connaught_social_classes):
+county_total = sum(county) + self.farmers[index]
+self.connaught_totals.append(county_total)
+# make a list of lists of the %s of each class in each county
+def set_social_percentages(self): 
+for index, county in enumerate(self.connaught_social_classes):
+group_list = []
+for s_class in county:
+group_list.append(round((s_class / self.connaught_totals[index]) * 100))
+group_list.append(int(self.farmers[index] / self.connaught_totals[index] * 100))
+self.connaught_percentages.append(group_list)
+# return the list of lists of %s of classes in each county
+def get_social_percentages(self): 
+self.populate_counties_classes()
+self.populate_totals()
+self.set_social_percentages()
+return self.connaught_percentages
+\end{minted}
+Notice in the populate\textunderscore counties\textunderscore classes function I had to make a provision for the Farmer social class. The number of farmers in each county were acquired by extracting data from the Central Statistics Office. This data was then stored in a seperate CSV file. It was necessary to subtract the number of famers from the DE Social Class \cite{pfizer}, so that it would match the format of the polling data. This also allowed for a more accurate representation of the population in the Republic of Ireland, as desired.
 \subparagraph{Historical}
+Each election from 1992 to 2011 was analysed with the goal of calculating the percentage of seats each party won per constituency. In the codebase, each election year has been given its own class. If I had had the additional time, it may have been useful to create a more generic class that could take data from any year and return the list of percentages for each party as requested.  An example of the code for these election classes is provided below: 
 \begin{minted}{python}
 import pandas as pd
 from collections import Counter
@@ -421,32 +587,161 @@ self.flatten_df()
 self.set_percentages()
 
 def get_data(self):
-return self.historical_percentages # return the percentage of wins for each party in each constituency
-
-
+# return the percentage of wins for each party in each constituency
+return self.historical_percentages 
 \end{minted}
+Finally, there is a class that takes the results of the above analysis for the 2011 and 2007 elections. Within this class, it is then possible to calculate the average percentage per constituency for each party. It was not possible to take election results from other years as there have been so many constituency changes over the past 10-20 years. By only focusing on the 2007 and 2011 elections, it was possible to gaurantee far greater consistency and reliability across the constituencies.  Although not exhaustive, these years still provide a clear example of how this class can be applied for the purpose of this project. 
 \section{Database (Neo4j)}
 \subsection{Overview}
+The population of the database consists of 3,140,813 people, with five nodes to represent the different politcal parties currently active in the Republic of Ireland (i.e. Fianna Fail, Sinn Fein, Labour, Fine Gael and Independent). The independent category contains independent politicians as well as politicians that belong to more minor parties (e.g. PBP and AAA). Each of the nodes of the population have various properties. Images of the two types of population nodes used in my database, as well as an image displaying the overall list of constituency properties, will be displayed below.
+	\begin{figure}[h]
+		\caption{Neo4j System Information}
+		\centering
+		\includegraphics[width=7cm, height=3cm]{img/neo4j-monitor}
+	\end{figure}
+\pagebreak
+
+The first image shows one of two types of nodes in the database. This node has the properties "marital\textunderscore status – married", "gender -female", "location – Monaghan" and a unique "id".  This node carries the following labels: "A5", "DE", "Female", "Married" and "Voter". 
+\begin{figure}[h]
+	\caption{Neo4j Node Example 1}
+	\centering
+	\includegraphics[width=15cm, height=10cm]{img/neo4j-noconst}
+\end{figure}
+\pagebreak
+
+The second image shows the next type of  population node. This has the extra property constituency. The reason for this is that when querying the database for how many people are in a constituency, I became aware of a flaw in my original database design. Because some counties have multiple constituencies in them (e.g. Dublin had 12 in 2011 and 2007), it was necessary to calculate what percentage of people live in which constituency within those counties. I will describe the nature of this process in the next section (i.e. Section 5.4.2 - Prediction). The third image displays a breakdown of the relevant constituencies. 
+\begin{figure}[h]
+	\caption{Neo4j Node Example 2}
+	\centering
+	\includegraphics[width=15cm, height=10cm]{img/neo4j-const}
+\end{figure}
+\pagebreak
+
+Each node has a relationship called “votes”, which dictates what party the person statistically will be most likely to vote for based on the prediction analysis. Along with these relationships, each node also has labels which are based on various property values ( please refer to section 5.4.2. for the relevant details regarding the retionale for this decision). The image below shows the complete list of labels used in the database for this project:
+\begin{figure}[h]
+	\caption{Neo4j Labels}
+	\centering
+	\includegraphics[width=7cm, height=3cm]{img/neo4j-labels}
+\end{figure}
+\linebreak
+
+The labels A1 through A5 match the age groupings (i.e A1 = 18-24, A2 = 25-34, A3 = 35-49, A4 = 50-64 and A5 = 65+). See the Pfizer report for the Social Class listings \cite{pfizer}. As the labels were based on the properties described above, this significantly improved the speed of querying my database. 
+\pagebreak
+
+Finally, the next image illustrates an example of how the nodes of people are related to the parties within my database. 
+\begin{figure}[h]
+	\caption{Neo4j Relationships}
+	\centering
+	\includegraphics[width=15cm, height=10cm]{img/neo4-relationships}
+\end{figure}
+\pagebreak
+
 \subsection{Database creation}
+The CSV files generated from the primary population class were directly imported into the database by creating a folder in the neo4j directory called “imports”. This was important as neo4j will not import anything unless the relevant data is stored within this specified folder.  The following commands were then run on the neo4j browser console \cite{loadcsv}:
+\begin{minted}{sql}
+LOAD CSV WITH HEADERS FROM "file:/connaught_population_female.csv" as line
+CREATE (:Voter { id: line.id, gender: line.gender, location: line.location,
+ marital_status: line.martial_status})
+\end{minted}
+To import the files, adjustments had to be made to to the "config" file \cite{heapsize} It was necessary to increase the initial and maximum heap size settings from 512mb to 2048mb to accomodate for importing the province CSV files.  For example, the leinster province CSV contains over 900,000 rows of data to represent th population of Dublin in the database. Such a large dataset requires a greater heap size.
+
+Finally, in order to assign labels to each node for use instead of properties, I created two types of scripts.  Both of these scripts use the library py2neo. The first one is the "set\textunderscore intial\textunderscore labels" script. This script queries the database based on properties and assign labels to the nodes which match the queried patterns. The second script was created for assigning social class labels to each node. 
+In order to do this, it was necessary to calculate the estimated percentage of population per county present in each social class. These estimations were sourced from the social class analysis scripts which have already been descibed in detail above ( please refer to section 5.2.3.1.2. Social Classes in the Methodology section for more information).
+\pagebreak
+
 \section{Python w/Flask}
 \subsection{Overview}
-\subsection{Prediction}	
+The application is powered by a Python Flask framework. As touched upon briefly in the Methodology chapter, I researched work by Nicole White, a data scientist. Her work includes demonstrations of applications which combine neo4j and python using the Flask framework. One such example of a project structure created by Nicole which was adapted from the Flask documentation, served as the basis for the structure of my own application \cite{nicolewhite}.
+
+The data folder contains all datasets used in the creation of this project. The models folder contains all scripts related to the manipulation of data and interaction with the Neo4j database. The static and templates folder hold all relevant files relating to the front-end of the application. the "\textunderscore \textunderscore init.py\textunderscore \textunderscore" file and the "views.py" file are Flask specific and both are required for the running of the application.  The below image illustrates the adaption of the Flask structure used within the current project:
+
+\begin{figure}[h]
+	\caption{Flask Application Structure}
+	\centering
+	\includegraphics[width=15cm, height=10.5cm]{img/flask}
+\end{figure}
+\pagebreak
+
+\subsection{Prediction Analysis}	
+This section will describe the scripts created for the purpose of election forecasting.  For more information regarding the research behind the chosen prediction analysis, please refer to section 3.1.3 in the Methodology section in Chapter 3.  Two scripts were created, namely: 1) A probability calculator script and 2) a d’Hondt method script. 
+
+The "probability\textunderscore calculator" script calculates the probability of voters with certain criteria (i.e. demographics) voting for a particular political party. It does this by taking all the polling data related to specified criteria and then combining this information with the historical average of the relevant constituency for each party.  It also takes into account the following two characteristics of the Republic of Ireland political system:
+\begin{itemize}
+	\item Some constituencies are made up of multiple counties.
+	\item Some counties have have multiple constituencies.
+\end{itemize}
+This script has one primary function that aims to process a huge amount of data as efficiently as possible (i.e. without having to create more CSV files). It uses the py2neo library to connect to the database and find voters depending on their demographic characteristics. The script then calculates their probability of voting for a particular party and sets a relationship within the database to that  specified party. As Neo4j’s write performance can be quite slow, this script can take a minute or two to run depending on the matching pattern criteria specified.
+
+The d’hondt method script uses the d’hondt method to calculate the amount of seats a party has been allocated in each constituency As there were changes to the political landscape in terms of constituency borders and the creation of new constituencies for the 2016 general election, it was necessary to make special provisions for these changes [35].  Similar to the probability calculator script, this script uses py2neo to calculate the number of votes in each party within each constituency and then applies the d’hondt method to the result to give the estimated amount of seats per party. The data is then stored in JSON format to be used in the front-end with the d3 visualisation JavaScript library. 
+\pagebreak
+
 \section{Front-End}
+The below images display the two views created for the front-end of this application. It shows two interactive maps of Ireland. The maps were created with the d3 v2 visualisation functionality, which made it possible to display maps of the Republic of Ireland. The reason for using version 2 instead of the most recently released version (i.e. v4) is that v2 facilitated the map creation process more easily. V4 appeared to be more complicated to use in order to perform this task. Hence, I choose to opt for v2 in the end. 
+The codebase for the front-end has been adapted from another project I discovered online using the map functionality of d3 \cite{tax}. The data for the two maps is stored in two separate JSON files, one holding the predictions and the other holding the actual results of the 2016 general election in Ireland.  The three images below shows the first of the two available views for the application. It has two maps of Ireland, the first map holding the prediction data and the second map holding the actual results and the data displayed between them. 
 
+\begin{figure}[h]
+	\caption{Front-End View Example 1}
+	\centering
+	\includegraphics[width=10cm, height=5cm]{img/view1}
+\end{figure}
+\begin{figure}[h]
+	\caption{Front-End View Example 2}
+	\centering
+	\includegraphics[width=10cm, height=5cm]{img/view1part2}
+\end{figure}
+\begin{figure}[h]
+	\caption{Front-End View Example 3}
+	\centering
+	\includegraphics[width=10cm, height=5cm]{img/view1part3}
+\end{figure}
+
+\pagebreak
+
+The next images display an alternative view available for the application. It allows the the user compare the predictions and the actual results side-by-side as both datasets are stored on the one map. 
+\begin{figure}[h]
+	\caption{Front-End View Example 4}
+	\centering
+	\includegraphics[width=10cm, height=5cm]{img/view2part1}
+\end{figure}
+\begin{figure}[h]
+	\caption{Front-End View Example 5}
+	\centering
+	\includegraphics[width=10cm, height=5cm]{img/view2part2}
+\end{figure}
 \chapter{System Evaluation}
-As many pages as needed.
-\begin{itemize}
-\item Prove that your software is robust. How? Testing etc. 
-\item Use performance benchmarks (space and time) if algorithmic.
-\item Measure the outcomes / outputs of your system / software against the objectives from the Introduction.
-\item Highlight any limitations or opportuni-ties in your approach or technologies used.
-\end{itemize}
+This section will discuss the outcomes of this project, with a view to evaluating how the goals of the project have been achieved according to my original objectives. It will also highlight any relevant limitations, along with providing recommendations for any future investigations in this context.
+\section{Objectives vs Outcomes}
+The purpose of this project was to create an example of how an application could be built and data analytics used to predict the results of a general election in Ireland. Specifically, I aimed to predict the results of the 2016 election as an example of how such an application could be designed. It was easily possible to benchmark the accuracy of my application by simply comparing my prediction outcomes with the actual results for the 2016 general election. As the map shows, these predictions are not entirely accurate. There a number of reasons for this which I will outline as limitations in section 6.2. I will also suggest various recommendations which may help to overcome these limitations for any future investigations in my conclusion section.  
 
+Nevertheless, this application also carries a number of strengths in its evaluation. Firstly, it is functional and it therefore fulfils the main objective of the project simply by illustrating proof of concept. This has been achieved through the creation of a Python Flask framework application with a Neo4j database and a front end using d3.JS. This provides a working template for all future investigations in this context.  Secondary, in terms of robustness, I feel that the project is set up in a way that means that adjustments to the general prediction design can be easily implemented by editing the probability calculator script. An expert in political science or data analytics could potentially put an alternative prediction design into that class and then run the program again to obtain more accurate results in future.  Thirdly, although the front-end of my application may appear somewhat basic visually, it is also user-friendly and sufficiently interactive to serve its intended purpose. 
+\section{Limitations}
+The three main limitations which emerged throughout the creation process for this application will be discussed in this section. They can be roughly summarized as follows: 1. A lack of accuracy in terms of the method used for prediction, 2. The time required to run each script and 3. A lack of inbuilt diverse functionality for the front-end.
+   
+Firstly, the method used for prediction in this application is a very basic interpretation of  ideas taken from Nate Silver (creator of fivethirtyeight.come) and Dr. Adrian Kavanagh, an Irish political analyst. 
+The area of predictive analytics in terms of computer science is arguably a more complex field as it requires substantial additional expertise in the area of statistics and political science. Furthermore, it would have been beyond the allotted time-frame and scope of this particular project to attempt a more complex model. Therefore, while never been likely to be entirely accurate in its method, the more basic design served as a compromise in achieving the competing goals of this project. 
+
+Secondly, the time taken to run each script was slowed down by the use of py2neo for writing to database. In hindsight, it would have been more efficient to use Neo4j import tools to import all data into the database directly. This would also likely have allowed the the final script to run slightly faster. Using py2neo to query from the database only may also have helped in this regard.
+
+Thirdly, although never part of my core objectives, it now seems wasteful that the project was not designed with more diverse options for functionality in the front-end. For example, it could have been useful if there had been an inbuilt database search function for the user to explore any particular population characteristics as desired. However, time was unfortunately another constraint in this regard again. 
 \chapter{Conclusion}
-About three pages.
+I started this project with no experience of any of the technologies used in the process of its development. I had never before attempted a project requiring the application of data analytics and prediction analysis techniques. I therefore now feel that I have learned a huge and diverse amount in a relatively short space of time over the past few months. All in all, I feel that this learning is reflected both in my final application as well as this dissertation outlining the rationale behind each step of the process.  
 
-\begin{itemize}
-\item Briefly summarise your context and ob-jectives (a few lines).
-\item Highlight your findings from the evalua-tion section / chapter and any opportuni-ties identified.
-\end{itemize}
+Election forecasting is becoming of increasing interest within the field of computer science. This is due in part to the increased availability of relevant population data, but also because of the increasing power of processors for cope with increasing computational complexity.  The overall goal of this project was to create a web application for specifically for election forecasting in an Irish-setting, based on the results of previous elections and polling data. 
 
+To recap, the objectives I set out in order to achieve this goal were as follows: 1) To create a database for the republic of Ireland's electorate, including future possible electorate members, 2) To create a model which could predict the results of the 2016 general election and illustrate how this can be implemented in practice and 3) To create interactive maps of Ireland which would display the predicted or actual results, depending on which map was clicked. 
+
+As described above, the project has a number of strengths in the evaluation of its application. It provides a working template for election forecasting in a Irish setting, as well as an example front-end platform which could be used for data visualization in this context. Furthermore, it has compiled a comprehensive database concerning the demographic characteristics of the 2011 census data. 
+I have also outlined the barriers faced in achieving the goals of this project, including the time  constraints and my lack of prior expertise in the area of statistical analysis and political science.
+ 
+However, insights can be gained from these limitations for future developers who are likely to encounter similar challenges in attempting a more cohesive prediction model. In the next and final section, I will outline some recommendations which I think may be helpful to bear in mind for any future investigations in this context.
+
+\section{Recommendations}
+Firstly, the scope with which there would be to develop a more comprehensive model with greater accuracy could be greatly improved with a more diverse team of developers associated with varying backgrounds of experience. An example of such a team could include an expert in political science, an expert in data analytics and software developers with varying levels of experience. This would allow for the use of a more complex statistical prediction model in this context.
+
+Secondly, Neo4j is one of perhaps the most powerful applications currently available for creating multiple relationships between data as it is based on graph theory. Although it was not possible to display its full potential in the current project, it is important to highlight this point for future developers interested in this area. 
+
+Thirdly, when importing data, it is most efficient to use Neo4’s import tools in order to import data into the database directly. Compared to using a REST interface such as py2neo, this is a much faster method.
+
+Fourthly, there is huge potential when building this type of application to leave more scope for the diversity of the front-end functionality. I think that the idea of auto-generating graphs and maps based on user input by combining py2eno and d3 would make this an interesting additional feature for the application. For example, this could allow the user to potentially search for different demographic characteristics of the general population from the 2011 census.
+
+Finally, the idea of this project was originally inspired by the provisional release of the 2016 census 2016. Upon further investigation, it became apparent that this dataset was too incomplete for use in the current project. However, it is likely that this dataset will be fully released in the near future. This dataset may offer an exciting opportunity to provide an accessible representation of the current demographic breakdown of the Irish population in an interactive map format. Furthermore, it will also an up-to-date dataset for use in any future investigations concerning election forecasting in an Irish setting. 
